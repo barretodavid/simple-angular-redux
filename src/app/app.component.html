@@ -1,3 +1,13 @@
-<h1>
-  {{title}}
-</h1>
+<div>
+  <input type="text" #input />
+  <button (click)="addTodo(input)">Add Todo</button>
+</div>
+<ul>
+  <li class="todo" [class.completed]="todo.completed" 
+    *ngFor="let todo of todos; let index = index"
+    (click)="toggleCompletion(todo)"
+  >
+    {{ todo.description }}
+    <button (click)="removeTodo(todo.id)">X</button>
+  </li>
+</ul>
