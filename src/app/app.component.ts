@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
+import { Observable } from 'rxjs';
 import * as uuid from 'uuid';
+
+import { StoreService, ADD_TODO, REMOVE_TODO, TOGGLE_TODO } from './store.service';
 
 class Todo {
   id: string = uuid();
@@ -14,20 +17,34 @@ class Todo {
 })
 export class AppComponent {
   todos: Todo[] = [];
+  todos$: Observable<Todo[]>;
+
+  constructor(private store: StoreService) {
+    this.todos$ = store.select();
+  }
+
   addTodo(input: HTMLInputElement) {
-    const newTodo = new Todo(input.value);
-    this.todos = [...this.todos, newTodo];
+    const todo = new Todo(input.value);
+    this.store.dispatch({ type: ADD_TODO, payload: todo });
     input.value = '';
+
+    // const newTodo = new Todo(input.value);
+    // this.todos = [...this.todos, newTodo];
+    // input.value = '';
   }
   toggleCompletion(todo: Todo) {
-    const index = this.todos.indexOf(todo);
-    this.todos = [
-      ...this.todos.slice(0, index),
-      Object.assign({}, todo, {completed: !todo.completed}),
-      ...this.todos.slice(index + 1)
-    ];
+    this.store.dispatch({ type: TOGGLE_TODO, payload: todo });
+
+
+    // const index = this.todos.indexOf(todo);
+    // this.todos = [
+    //   ...this.todos.slice(0, index),
+    //   Object.assign({}, todo, {completed: !todo.completed}),
+    //   ...this.todos.slice(index + 1)
+    // ];
   }
   removeTodo(todoId: string) {
-    this.todos = this.todos.filter(todo => todo.id !== todoId)
+    this.store.dispatch({ type: REMOVE_TODO, payload: todoId })
+    // this.todos = this.todos.filter(todo => todo.id !== todoId)
   }
 }
